@@ -368,6 +368,7 @@ def train(model, device, config, epochs=5, batch_size=1, save_cp=True, log_step=
 
         with tqdm(total=n_train, desc=f'Epoch {epoch + 1}/{epochs}', unit='img', ncols=50) as pbar:
             for i, batch in enumerate(train_loader):
+                #if i >40: break
                 global_step += 1
                 epoch_step += 1
                 images = batch[0]
@@ -411,33 +412,34 @@ def train(model, device, config, epochs=5, batch_size=1, save_cp=True, log_step=
                                           scheduler.get_lr()[0] * config.batch))
 
                 pbar.update(images.shape[0])
+            
+            if int(epoch)%3==1:
+                if cfg.use_darknet_cfg:
+                    eval_model = Darknet(cfg.cfgfile, inference=True)
+                else:
+                    eval_model = Yolov4(cfg.pretrained, n_classes=cfg.classes, inference=True)
+                # eval_model = Yolov4(yolov4conv137weight=None, n_classes=config.classes, inference=True)
+                if torch.cuda.device_count() > 1:
+                    eval_model.load_state_dict(model.module.state_dict())
+                else:
+                    eval_model.load_state_dict(model.state_dict())
+                eval_model.to(device)
+                evaluator = evaluate(eval_model, val_loader, config, device)
+                del eval_model
 
-            if cfg.use_darknet_cfg:
-                eval_model = Darknet(cfg.cfgfile, inference=True)
-            else:
-                eval_model = Yolov4(cfg.pretrained, n_classes=cfg.classes, inference=True)
-            # eval_model = Yolov4(yolov4conv137weight=None, n_classes=config.classes, inference=True)
-            if torch.cuda.device_count() > 1:
-                eval_model.load_state_dict(model.module.state_dict())
-            else:
-                eval_model.load_state_dict(model.state_dict())
-            eval_model.to(device)
-            evaluator = evaluate(eval_model, val_loader, config, device)
-            del eval_model
-
-            stats = evaluator.coco_eval['bbox'].stats
-            writer.add_scalar('train/AP', stats[0], global_step)
-            writer.add_scalar('train/AP50', stats[1], global_step)
-            writer.add_scalar('train/AP75', stats[2], global_step)
-            writer.add_scalar('train/AP_small', stats[3], global_step)
-            writer.add_scalar('train/AP_medium', stats[4], global_step)
-            writer.add_scalar('train/AP_large', stats[5], global_step)
-            writer.add_scalar('train/AR1', stats[6], global_step)
-            writer.add_scalar('train/AR10', stats[7], global_step)
-            writer.add_scalar('train/AR100', stats[8], global_step)
-            writer.add_scalar('train/AR_small', stats[9], global_step)
-            writer.add_scalar('train/AR_medium', stats[10], global_step)
-            writer.add_scalar('train/AR_large', stats[11], global_step)
+                stats = evaluator.coco_eval['bbox'].stats
+                writer.add_scalar('train/AP', stats[0], global_step)
+                writer.add_scalar('train/AP50', stats[1], global_step)
+                writer.add_scalar('train/AP75', stats[2], global_step)
+                writer.add_scalar('train/AP_small', stats[3], global_step)
+                writer.add_scalar('train/AP_medium', stats[4], global_step)
+                writer.add_scalar('train/AP_large', stats[5], global_step)
+                writer.add_scalar('train/AR1', stats[6], global_step)
+                writer.add_scalar('train/AR10', stats[7], global_step)
+                writer.add_scalar('train/AR100', stats[8], global_step)
+                writer.add_scalar('train/AR_small', stats[9], global_step)
+                writer.add_scalar('train/AR_medium', stats[10], global_step)
+                writer.add_scalar('train/AR_large', stats[11], global_step)
 
             if save_cp:
                 try:
@@ -476,7 +478,7 @@ def evaluate(model, data_loader, cfg, device, logger=None, **kwargs):
         model_input = np.concatenate(model_input, axis=0)
         model_input = model_input.transpose(0, 3, 1, 2)
         model_input = torch.from_numpy(model_input).div(255.0)
-        model_input = model_input.to(device)
+        model_input = model_input.to(device, dtype=torch.float) # zino RuntimeError: Input type (torch.cuda.ByteTensor) and weight type (torch.cuda.FloatTensor) should be the same
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
         if torch.cuda.is_available():

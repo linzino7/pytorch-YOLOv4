@@ -3,7 +3,7 @@ from torch import nn
 import torch.nn.functional as F
 from tool.torch_utils import *
 from tool.yolo_layer import YoloLayer
-
+import pandas as pd 
 
 class Mish(torch.nn.Module):
     def __init__(self):
@@ -452,20 +452,12 @@ class Yolov4(nn.Module):
 if __name__ == "__main__":
     import sys
     import cv2
-    device_ids =0
-    device = 'cuda:' + str(device_ids)
-    
+
     namesfile = None
-    if len(sys.argv) == 6:
+    if len(sys.argv) == 7:
         n_classes = int(sys.argv[1])
         weightfile = sys.argv[2]
-        imgfile = sys.argv[3]
-        height = int(sys.argv[4])
-        width = int(sys.argv[5])
-    elif len(sys.argv) == 7:
-        n_classes = int(sys.argv[1])
-        weightfile = sys.argv[2]
-        imgfile = sys.argv[3]
+        imgpath = sys.argv[3] # imgfile
         height = int(sys.argv[4])
         width = int(sys.argv[5])
         namesfile = sys.argv[6]
@@ -476,63 +468,123 @@ if __name__ == "__main__":
     model = Yolov4( n_classes=n_classes, inference=True)
     if torch.cuda.device_count() > 1: 
         #Zino RuntimeError: Error(s) in loading state_dict for Yolov4: Missing key(s) in state_dict
-        model = torch.nn.DataParallel(model, device_ids=[device_ids]) 
-    
-    pretrained_dict = torch.load(weightfile, map_location=torch.device(device))
+        model = torch.nn.DataParallel(model) 
+     
+    pretrained_dict = torch.load(weightfile, map_location=torch.device('cuda'))
     model.load_state_dict(pretrained_dict)
+    model.eval()
 
     use_cuda = True
     if use_cuda:
-        #model.cuda()
-        model.to(torch.device(device))
-
-    img = cv2.imread(imgfile)
-
-    # Inference input size is 416*416 does not mean training size is the same
-    # Training size could be 608*608 or even other sizes
-    # Optional inference sizes:
-    #   Hight in {320, 416, 512, 608, ... 320 + 96 * n}
-    #   Width in {320, 416, 512, 608, ... 320 + 96 * m}
-    sized = cv2.resize(img, (width, height))
-    sized = cv2.cvtColor(sized, cv2.COLOR_BGR2RGB)
-
+        model.cuda()
+    
+    if namesfile == None:
+        print("please give namefile")
+        raise
+        
+    import glob, re
     from tool.utils import load_class_names, plot_boxes_cv2
     from tool.torch_utils import do_detect
-    conf_thresh = 0.01
-    nms_thresh = 0.01
-    for i in range(2):  # This 'for' loop is for speed check
-                        # Because the first iteration is usually longer
-        boxes = do_detect(model, sized, conf_thresh, nms_thresh, use_cuda, device=device)
-    
-    img_box = []
-    scores = []
-    labels = []
-    width = img.shape[1]
-    height = img.shape[0]
-    for i in range(len(boxes)):
-        # (y1, x1, y2, x2). (top,left,right,bottom)
-        box = boxes[0][i]
-        x1 = box[0] * width
-        y1 = box[1] * height
-        x2 = box[2] * width
-        y2 = box[3] * height
-        img_box.append([y1, x1, y2, x2])
-        scores.append(box[4])
-        labels.append(box[6])
-    
-    print(boxes)
-    print('namefile',namesfile)
-    if namesfile == None:
-        if n_classes == 20:
-            namesfile = 'data/voc.names'
-        elif n_classes == 80:
-            namesfile = 'data/coco.names'
+    # make image list
+    def is_image_file(filename):
+        return any(filename.endswith(extension) for extension in [".png", ".jpg", ".jpeg"])
+
+    def get_img_fileid(filename, idx=2):
+        return  re.split('/|\.',filename)[idx]
+
+    def get_min_score(box):
+        """為了動態調整conf_thresh"""
+        df = pd.DataFrame(box[0], columns=['x1', 'y1', 'x2', 'y2', 's1', 's2', 'label'])
+        gdf = df.groupby('label').max()
+        if len(gdf)>0 :
+            mins = gdf['s1'].min() - (gdf['s1'].min() /10)
         else:
-            print("please give namefile")
+            mins = 0.04
+        return mins
+
+    def dup_max_score(box):
+        """只保留s最大的label"""
+        col = ['x1', 'y1', 'x2', 'y2', 's1', 's2', 'label']
+        df = pd.DataFrame(box[0], columns=col)
+        if len(df)<1: return [[]]
+        gdf = df[['s1','label']].groupby('label').max()
+        maxdf = pd.merge(gdf,df,how='inner', on=['s1'])
+        tmp = maxdf[col]
+        r = tmp.values.tolist()
+        for i in r: # label 要轉成 int
+             i[6] = int(i[6])
+        return [r]
+
+    #path_pattern = imgpath + '/*.*'
+    #files_list = glob.glob(path_pattern, recursive=True)
+    #image_filenames = []
+    #for file in files_list:
+    #    if is_image_file(file):
+    #        image_filenames.append(file)
+    image_filenames = []
+    path_pre = 'data/test/'
+    for i in range(1, 13069):
+        image_filenames.append(path_pre + str(i) + '.png')
+
+    print('lenth :path', len(image_filenames))
     
-    class_names = load_class_names(namesfile)
-    json_out = {'bbox': img_box,
-                'score': scores,
-                'label': labels}
-    print(json_out)
-    plot_boxes_cv2(img, boxes[0], 'predictions.jpg', class_names)
+    jasn_img = []
+    
+    for imgfile in image_filenames:
+        #try:
+            print(imgfile)
+            img = cv2.imread(imgfile)
+            sized = cv2.resize(img, (width, height))
+            sized = cv2.cvtColor(sized, cv2.COLOR_BGR2RGB)
+            imgname = get_img_fileid(imgfile) 
+            
+            #print(imgname) 
+            conf_thresh = 0.001
+            nms_thresh = 0.9
+            
+            boxes = [] 
+            for i in range(2):  # This 'for' loop is for speed check
+                                # Because the first iteration is usually longer
+                boxes = do_detect(model, sized, conf_thresh, nms_thresh, use_cuda)
+                conf_thresh = get_min_score(boxes)
+                if conf_thresh < 0.04: conf_thresh =0.04
+                print('conf_thresh', conf_thresh)
+            
+            #print('namefile',namesfile)
+            boxes = dup_max_score(boxes)
+            #print(boxes)
+ 
+            img_box = []
+            scores = []
+            labels = []
+            img_width = img.shape[1]
+            img_height = img.shape[0]
+            for i in range(len(boxes[0])):
+                # (y1, x1, y2, x2). (top,left,right,bottom)
+                box = boxes[0][i]
+                x1 = box[0] * img_width
+                y1 = box[1] * img_height
+                x2 = box[2] * img_width
+                y2 = box[3] * img_height
+                img_box.append([y1, x1, y2, x2])
+                scores.append(box[4])
+                labels.append(box[6])
+            
+            json_out = {'bbox': img_box,
+                    'score': scores,
+                    'label': labels}
+            jasn_img.append(json_out)
+             
+            class_names = load_class_names(namesfile)
+            output_folder = 'prid/'
+            plot_boxes_cv2(img, boxes[0], output_folder+imgname+'prdi.jpg', class_names)
+        #except Exception as e:
+        #    print(e)
+
+    print('len in json:', len(jasn_img))
+    print(jasn_img)
+    
+    import json  
+    # output 
+    with open("0856169.json", "w") as outfile:  
+        json.dump(jasn_img, outfile) 
