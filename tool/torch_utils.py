@@ -73,8 +73,8 @@ def convert2cpu_long(gpu_matrix):
 
 
 
-def do_detect(model, img, conf_thresh, nms_thresh, use_cuda=1, device='cuda:0'):
-    #model.eval()
+def do_detect(model, img, conf_thresh, nms_thresh, use_cuda=1):
+    model.eval()
     t0 = time.time()
 
     if type(img) == np.ndarray and len(img.shape) == 3:  # cv2 image
@@ -86,10 +86,7 @@ def do_detect(model, img, conf_thresh, nms_thresh, use_cuda=1, device='cuda:0'):
         exit(-1)
 
     if use_cuda:
-        #img = img.cuda()
-        img = img.to(torch.device(device))
-        #print('img to :', device)
-        #print(img.type())
+        img = img.cuda()
     img = torch.autograd.Variable(img)
     
     t1 = time.time()
@@ -98,10 +95,10 @@ def do_detect(model, img, conf_thresh, nms_thresh, use_cuda=1, device='cuda:0'):
 
     t2 = time.time()
 
-    print('-----------------------------------')
-    print('           Preprocess : %f' % (t1 - t0))
-    print('      Model Inference : %f' % (t2 - t1))
-    print('-----------------------------------')
+    #print('-----------------------------------')
+    #print('           Preprocess : %f' % (t1 - t0))
+    #print('      Model Inference : %f' % (t2 - t1))
+    #print('-----------------------------------')
 
     return utils.post_processing(img, conf_thresh, nms_thresh, output)
 
