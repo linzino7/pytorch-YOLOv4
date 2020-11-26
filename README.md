@@ -35,9 +35,8 @@ train.txt
 
 #### Download Classes Image
 Data: https://drive.google.com/drive/u/1/folders/1Ob5oT9Lcmz7g5mVOcYH3QugA7tV3WsSl
+
 Download and extract *tain.tar.gz* and *test.tar.gz* to *data* directory.
-
-
 
 
 ## Training
