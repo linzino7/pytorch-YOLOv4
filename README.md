@@ -1,9 +1,7 @@
 # pytorch-YOLOv4
 A minimal PyTorch implementation of YOLOv4.
 
-This Rep forked from [Tianxiaomo/pytorch-YOLOv4](https://github.com/Tianxiaomo/pytorch-YOLOv4).
-
-See [Original_README] (https://github.com/linzino7/pytorch-YOLOv4/blob/master/Original_README.md).
+This Rep forked from [Tianxiaomo/pytorch-YOLOv4](https://github.com/Tianxiaomo/pytorch-YOLOv4). See [Original_README](https://github.com/linzino7/pytorch-YOLOv4/blob/master/Original_README.md).
 
 ## Hardware
 - Ubuntu 18.04 LTS
