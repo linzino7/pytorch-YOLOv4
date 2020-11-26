@@ -43,8 +43,11 @@ Data: https://drive.google.com/drive/u/1/folders/1Ob5oT9Lcmz7g5mVOcYH3QugA7tV3Ws
 
 Download and extract *tain.tar.gz* and *test.tar.gz* to *data* directory.
 
-
 ## Training
+### Setting
+You can setting bach size and epoch in [cfg.py](https://github.com/linzino7/pytorch-YOLOv4/blob/master/cfg.py)
+
+### Train models
 To train models, run following commands.
 ```
 $ python3 train.py -d data/ -classes 10 -g 0 -pretrained ./weight/yolov4.conv.137.pth
