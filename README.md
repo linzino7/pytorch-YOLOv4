@@ -77,7 +77,7 @@ The expected training times are:
 Model | GPUs | Image size | Training Epochs | Training Time | Bach Size |
 ------------ | ------------- | ------------- | ------------- | ------------- | -------------|
 YOLOv4 | 1x NVIDIA T4 | 608x608 | 1 | 2.5 hours | 4 |
-YOLOv4 | 4x NVIDIA RTX 1080 8G | 608x608 | 1 | 0.6 hour | 32 |
+YOLOv4 | 4x NVIDIA GTX 1080 | 608x608 | 1 | 0.6 hour | 32 |
 
 ### Muti-GPU Training
 ```
