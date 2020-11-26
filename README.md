@@ -57,10 +57,10 @@ $ python3 train.py -d data/ -classes 10 -g 0 -pretrained ./weight/yolov4.conv.13
 ```
 The expected training times are:
 
-Model | GPUs | Image size | Training Epochs | Training Time | Bach Size
------------- | ------------- | ------------- | ------------- | -------------|
-YOLOv4 | 1x NVIDIA T4 | 608*608 | 1 | 2.5 hours | 4
-YOLOv4 |4x NVIDIA RTX 1080 8G | 608*608 | 10 | 8 hour |
+Model | GPUs | Image size | Training Epochs | Training Time | Bach Size |
+------------ | ------------- | ------------- | ------------- | ------------- | -------------|
+YOLOv4 | 1x NVIDIA T4 | 608x608 | 1 | 2.5 hours | 4 |
+YOLOv4 |4x NVIDIA RTX 1080 8G | 608x608 | 10 | 8 hour | 32 |
 
 ### Muti-GPU Training
 ```
