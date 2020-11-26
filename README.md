@@ -12,7 +12,7 @@ This Rep forked from [Tianxiaomo/pytorch-YOLOv4](https://github.com/Tianxiaomo/p
 ## Reproducing Submission
 To reproduct my submission without retrainig, do the following steps:
 
-1.  [Dataset Preparation](#Dataset Preparation)
+1.  [Dataset Preparation](#Dataset-Preparation)
 2.  [Training](#Training)
 3.  [Inference](#Inference)
 
