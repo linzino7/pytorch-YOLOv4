@@ -58,7 +58,7 @@ The expected training times are:
 Model | GPUs | Image size | Training Epochs | Training Time | Bach Size |
 ------------ | ------------- | ------------- | ------------- | ------------- | -------------|
 YOLOv4 | 1x NVIDIA T4 | 608x608 | 1 | 2.5 hours | 4 |
-YOLOv4 |4x NVIDIA RTX 1080 8G | 608x608 | 1 | 0.6 hour | 32 |
+YOLOv4 | 4x NVIDIA RTX 1080 8G | 608x608 | 1 | 0.6 hour | 32 |
 
 ### Muti-GPU Training
 ```
@@ -67,8 +67,17 @@ $ python3 train.py -d data/ -classes 10 -g 0,1,2,3 -pretrained ./weight/yolov4.c
 
 ## Inference
 
+### Inference single images
+```
+python3 models.py 10 Yolov4_epoch10.pth data/test/1.png 608 608 data/SVHN.names
+```
 
-Reference:
+### Inference images in folder
+```
+$ python3 models_mut.py 10 Yolov4_epoch22_pre.pth data/test/ 608 608 data/SVHN.names
+```
+
+# Reference:
 - [Tianxiaomo/pytorch-YOLOv4](https://github.com/Tianxiaomo/pytorch-YOLOv4)
 - https://github.com/eriklindernoren/PyTorch-YOLOv3
 - https://github.com/marvis/pytorch-caffe-darknet-convert
