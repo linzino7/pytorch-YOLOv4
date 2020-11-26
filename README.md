@@ -43,6 +43,16 @@ Data: https://drive.google.com/drive/u/1/folders/1Ob5oT9Lcmz7g5mVOcYH3QugA7tV3Ws
 
 Download and extract *tain.tar.gz* and *test.tar.gz* to *data* directory.
 
+### Transform data
+Use construct_datasets.py to make train.txt .
+
+```
+# train.txt and val.txt  
+# left(x1) top(y1)  right(x2) bottom(y2) label
+image_path1 x1,y1,x2,y2,id x1,y1,x2,y2,id x1,y1,x2,y2,id ...
+image_path2 x1,y1,x2,y2,id x1,y1,x2,y2,id x1,y1,x2,y2,id ...
+```
+
 ## Training
 ### Setting
 You can setting bach size and epoch in [cfg.py](https://github.com/linzino7/pytorch-YOLOv4/blob/master/cfg.py)
