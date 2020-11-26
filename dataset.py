@@ -13,6 +13,7 @@
 import os
 import random
 import sys
+import re
 
 import cv2
 import numpy as np
@@ -423,11 +424,9 @@ def get_image_id(filename:str) -> int:
     >>> no = f"{int(no):04d}"
     >>> return int(lv+no)
     """
-    raise NotImplementedError("Create your own 'get_image_id' function")
-    lv, no = os.path.splitext(os.path.basename(filename))[0].split("_")
-    lv = lv.replace("level", "")
-    no = f"{int(no):04d}"
-    return int(lv+no)
+    #raise NotImplementedError("Create your own 'get_image_id' function")
+    arr = re.split("/|\.",filename)  
+    return int(arr[-2])
 
 
 if __name__ == "__main__":

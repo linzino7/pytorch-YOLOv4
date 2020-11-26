@@ -539,7 +539,7 @@ if __name__ == "__main__":
             imgname = get_img_fileid(imgfile) 
             
             #print(imgname) 
-            conf_thresh = 0.001
+            conf_thresh = 0.6
             nms_thresh = 0.9
             
             boxes = [] 
@@ -577,7 +577,7 @@ if __name__ == "__main__":
              
             class_names = load_class_names(namesfile)
             output_folder = 'prid/'
-            plot_boxes_cv2(img, boxes[0], output_folder+imgname+'prdi.jpg', class_names)
+            #plot_boxes_cv2(img, boxes[0], output_folder+imgname+'prdi.jpg', class_names)
         #except Exception as e:
         #    print(e)
 
@@ -586,5 +586,5 @@ if __name__ == "__main__":
     
     import json  
     # output 
-    with open("0856169.json", "w") as outfile:  
+    with open("0856169_13_.6_.9.json", "w") as outfile:  
         json.dump(jasn_img, outfile) 
