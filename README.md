@@ -51,6 +51,7 @@ Use construct_datasets.py to make train.txt .
 # left(x1) top(y1)  right(x2) bottom(y2) label
 image_path1 x1,y1,x2,y2,id x1,y1,x2,y2,id x1,y1,x2,y2,id ...
 image_path2 x1,y1,x2,y2,id x1,y1,x2,y2,id x1,y1,x2,y2,id ...
+...
 ```
 
 Names file  example is in [data/SVHN.names](https://github.com/linzino7/pytorch-YOLOv4/blob/master/data/SVHN.names)
@@ -59,6 +60,7 @@ Names file  example is in [data/SVHN.names](https://github.com/linzino7/pytorch-
 Label1
 Label2
 Label3
+...
 ```
 
 ## Training
