@@ -11,41 +11,32 @@ This Rep forked from [Tianxiaomo/pytorch-YOLOv4](https://github.com/Tianxiaomo/p
 
 ## Reproducing Submission
 To reproduct my submission without retrainig, do the following steps:
-1. [Installation](#installation)
-2. [Download Official Image](#download-official-image)
-3. [Training](#Training)
-4. [Inference](#Inference)
+1. [Dataset Preparation](##Dataset Preparation)
+2. [Training](##Training)
+3. [Inference](##Inference)
 
-
-## Installation
-All requirements should be detailed in requirements.txt. Using Anaconda is strongly recommended.
-```
-pip install -r requirements.txt
-```
 
 ## Dataset Preparation
 All required files except images are already in data directory.
 If you generate CSV files (duplicate image list, split, leak.. ), original files are overwritten. The contents will be changed, but It's not a problem.
 
 ### Prepare Images
-After downloading and converting images, the data directory is structured as:
+After downloading images, the data directory is structured as:
 ```
-data
-  +- training_data
-  |  +- training_data
-  +- testing_data
-  |  +- testing_data
-  +- training_labels.csv
+train.txt
+  +- data/
+  | +- train/
+  | +- test/
+  | +- training_labels.csv
+  | +- val.txt
+
 ```
 
-#### Download Official Image
-Download and extract *cs-t0828-2020-hw1.zi* to *dataw* directory.
-If the Kaggle API is installed, run following command.
-```
-$ kaggle competitions download -c cs-t0828-2020-hw1
-$ mkdir data
-$ unzip cs-t0828-2020-hw1.zip -d data
-```
+#### Download Classes Image
+Data: https://drive.google.com/drive/u/1/folders/1Ob5oT9Lcmz7g5mVOcYH3QugA7tV3WsSl
+Download and extract *tain.tar.gz* and *test.tar.gz* to *data* directory.
+
+
 
 
 ## Training
@@ -69,7 +60,7 @@ $ python3 train.py -d data/ -classes 10 -g 0,1,2,3 -pretrained ./weight/yolov4.c
 
 ### Inference single images
 ```
-python3 models.py 10 Yolov4_epoch10.pth data/test/1.png 608 608 data/SVHN.names
+$ python3 models.py 10 Yolov4_epoch10.pth data/test/1.png 608 608 data/SVHN.names
 ```
 
 ### Inference images in folder
