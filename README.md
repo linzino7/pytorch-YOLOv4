@@ -96,6 +96,10 @@ $ python3 models.py 10 Yolov4_epoch10.pth data/test/1.png 608 608 data/SVHN.name
 $ python3 models_mut.py 10 Yolov4_epoch22_pre.pth data/test/ 608 608 data/SVHN.names
 ```
 
+## Result
+![](https://i.imgur.com/5LjErfL.jpg)
+![](https://i.imgur.com/hZshsLu.jpg)
+
 # Reference:
 - [Tianxiaomo/pytorch-YOLOv4](https://github.com/Tianxiaomo/pytorch-YOLOv4)
 - https://github.com/eriklindernoren/PyTorch-YOLOv3
